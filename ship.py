@@ -12,6 +12,8 @@ class Ship:
         self.moving_right = False
         self.moving_left = False
 
+
+
     def blitme(self):
         self.screen.blit(self.image, self.rect)
 
