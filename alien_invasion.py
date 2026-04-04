@@ -1,9 +1,11 @@
 import pygame
 import sys
+from time import sleep
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from game.game_stat import GameStat
 
 class AlienInvasion:
     def __init__(self):
@@ -14,6 +16,7 @@ class AlienInvasion:
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.stat = GameStat(self)
         self._create_fleet()
 
     def _create_fleet(self):
@@ -77,14 +80,40 @@ class AlienInvasion:
         for bullet in self.bullets.copy():
             if bullet.rect.bottom < 0:
                 self.bullets.remove(bullet)
+        self._check_bullet_alien_collision()
+
+    def _check_bullet_alien_collision(self):
+        collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        if not self.aliens:
+            self.bullets.empty()
+            self._create_fleet()
 
     def _update_aliens(self):
         self._check_fleet_edges()
         self.aliens.update()
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            self._ship_hit()
+        self._check_aliens_bottom()
+
+    def _check_aliens_bottom(self):
+        screen_rect = self.screen.get_rect()
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= screen_rect.bottom:
+                self._ship_hit()
+                break
+
+    def _ship_hit(self):
+        self.stat.ship_left -= 1
+        self.aliens.empty()
+        self.bullets.empty()
+        self.ship.center_ship()
+        self._create_fleet()
+        sleep(1)
+
 
     def _check_fleet_edges(self):
         for alien in self.aliens.sprites():
-            if alien.check_edges:
+            if alien.check_edges():
                 self._change_fleet_direction()
                 break
 
