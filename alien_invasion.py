@@ -103,12 +103,16 @@ class AlienInvasion:
                 break
 
     def _ship_hit(self):
-        self.stat.ship_left -= 1
-        self.aliens.empty()
-        self.bullets.empty()
-        self.ship.center_ship()
-        self._create_fleet()
-        sleep(1)
+        if self.stat.ship_left > 0:
+            self.stat.ship_left -= 1
+            print(self.stat.ship_left)
+            self.aliens.empty()
+            self.bullets.empty()
+            self.ship.center_ship()
+            self._create_fleet()
+            sleep(1)
+        else:
+            self.stat.game_active = False
 
 
     def _check_fleet_edges(self):
@@ -122,14 +126,14 @@ class AlienInvasion:
             alien.rect.y += self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1
 
-
     def run_game(self):
         while True:
-            self._check_events()
-            self.ship.update()
-            self._update_bullets()
-            self._update_aliens()
-            self.bullets.update()
+            if self.stat.game_active:
+                self._check_events()
+                self.ship.update()
+                self._update_bullets()
+                self._update_aliens()
+                self.bullets.update()
             self._update_screen()
 
 
