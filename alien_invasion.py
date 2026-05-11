@@ -113,6 +113,7 @@ class AlienInvasion:
             for alien in collisions.values():
                 self.stat.score += self.settings.alien_points * len(alien)
             self.sb.prep_score()
+            self.sb.check_high_score()
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
